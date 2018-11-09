@@ -45,8 +45,14 @@ let dBallTop = -10; // step size for animation (%)
 let splashScreen = document.getElementById("splash-screen");
 let timeRunning = document.getElementById("time-running");
 let scoreString = document.getElementById("score-string");
+let highScoreString = document.getElementById("high-score-string");
 let timerID;
 let stopWatch = 0;
+let score;
+let highScore;
+let firstScore = JSON.parse(window.localStorage.getItem("high_score"))
+if (firstScore)
+    highScoreString.innerHTML = firstScore;
 
 // Event handlers for keyboard and mouse activity
 window.addEventListener("keydown", function(e) {
@@ -137,12 +143,14 @@ function animateOneFrame() {
     timeRunning.innerHTML = stopWatch.toFixed(1);
 }
 function stopTimer() {
-	console.log("----stopping timer #" + timerID);
-	clearInterval(timerID);
-    scoreString.innerHTML = stopWatch.toFixed(2) + " " // show final score
+    console.log("----stopping timer #" + timerID);
+    clearInterval(timerID);
+    score = stopWatch.toFixed(2);
+    scoreString.innerHTML = score + " "; // show final score
+    displayHighScore();
 }
 
-// Navigation
+// Navigation and scoring
 function restart() {
     splashScreen.style.display = "none"; // hide the splashScreen
     stopWatch = 0;
@@ -154,4 +162,17 @@ function restart() {
     applyBallUnits(ballLeft, ballTop);
     dBallLeft = (Math.random() * Math.floor(3)) - 1
     dBallTop = -10;
+}
+function displayHighScore() {
+    // determine highest score
+    let pulledScore = JSON.parse(window.localStorage.getItem("high_score"));
+    if (pulledScore && parseInt(pulledScore) > score) {
+        highScore = pulledScore; // highScore is already a string
+    } else {
+        highScore = score + " "; // make highScore a string
+        console.log(highScore);
+        localStorage.setItem("high_score", JSON.stringify(highScore)); // push to localStorage
+    }
+    // display highest score
+    highScoreString.innerHTML = highScore;
 }
