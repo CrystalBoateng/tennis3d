@@ -2,7 +2,8 @@
 console.clear();
 
 // Define the styles for each depth
-let depthStyles = [{ // far
+let depthStyles = [
+    { // far
         backgroundColor: "#6700ce",
         border: "5px solid #7b00f6",
         zIndex: "400"
@@ -25,22 +26,32 @@ function applyDepthStyle(element, newDepth) {
 }
 
 // Set the racket's starting values
-let racket = document.getElementsByClassName("racket")[0];
-let racketLeft = 40; // initial horiz position (%)
-let racketStep = 10; // step size for animation
-let racketDepth = 1
-
+racket = {
+    domElement: document.getElementsByClassName("racket")[0],
+    position: {
+        left: 40, // initial horiz position (%)
+        depth: 1
+    },
+    velocity: {
+        left: 10, // step size for animation
+    }
+}
 // Set the ball's starting values
-applyDepthStyle(racket, racketDepth);
-let ball = document.getElementsByClassName("ball")[0];
-let ballLeft = 50; // initial horiz position (%)
-let ballTop = 300;
-let ballDepth = 1
-applyDepthStyle(ball, ballDepth);
-applyBallUnits(ballLeft, ballTop);
-let dBallLeft = (Math.random() * Math.floor(3)) - 1 // step size for animation (px)
-let dBallTop = -10; // step size for animation (%)
-
+applyDepthStyle(racket.domElement, racket.position.depth);
+ball = {
+    domElement: document.getElementsByClassName("ball")[0],
+    position: {
+        left: 50, // (% instead of px)
+        top: 300,
+        depth: 1
+    },
+    velocity: {
+        Left: (Math.random() * Math.floor(3)) - 1, // step size for animation (px)
+        Top: -10 // step size for animation (%)
+    }
+}
+applyDepthStyle(ball.domElement, ball.position.depth);
+applyBallUnits(ball.position.left, ball.position.top);
 // Set other starting values
 let splashScreen = document.getElementById("splash-screen");
 let timeRunning = document.getElementById("time-running");
@@ -50,79 +61,79 @@ let timerID;
 let stopWatch = 0;
 let score;
 let highScore;
-let firstScore = JSON.parse(window.localStorage.getItem("high_score"))
+let firstScore = JSON.parse(window.localStorage.getItem("tennis3d_high_score"));
 if (firstScore)
     highScoreString.innerHTML = firstScore;
 
 // Event handlers for keyboard and mouse activity
 window.addEventListener("keydown", function(e) {
     switch (e.keyCode || e.which) {
-        case 37:
+        case 37: // left arrow key
             e.preventDefault(); moveLeft(); break;
-        case 38:
+        case 38: // up arrow key
             e.preventDefault(); moveNearer(); break;
-        case 39:
+        case 39: // right arrow key
             e.preventDefault(); moveRight(); break;
-        case 40:
+        case 40: // down arrow key
             e.preventDefault(); moveFarther(); break;
-        case 32:
-            e.preventDefault(); break; // ignore space bar
-        case 13:
-            e.preventDefault(); break; // ignore enter key
+        case 32: // ignore space bar
+            e.preventDefault(); break;
+        case 13: // ignore enter key
+            e.preventDefault(); break;
     }
 });
 document.getElementById("start-button").addEventListener("click", startTimer);
 
 // Move the racket
 function moveNearer() {
-    if (racketDepth >= 2) // enforce a maximum racketDepth of 2
+    if (racket.position.depth >= 2) // enforce a maximum racket.position.depth of 2
         return false;
-    racketDepth += 1;
-    applyDepthStyle(racket, racketDepth)
+    racket.position.depth += 1;
+    applyDepthStyle(racket.domElement, racket.position.depth)
 }
 function moveFarther() {
-    if (racketDepth <= 0) // enforce a minimum racketDepth of 0
+    if (racket.position.depth <= 0) // enforce a minimum racket.position.depth of 0
         return false;
-    racketDepth -= 1;
-    applyDepthStyle(racket, racketDepth)
+    racket.position.depth -= 1;
+    applyDepthStyle(racket.domElement, racket.position.depth)
 }
 function moveLeft() {
-    if (racketLeft <= 0) // enforce a minimum horiz position of 0
+    if (racket.position.left <= 0) // enforce a minimum horiz position of 0
         return false;
-    racketLeft -= racketStep;
-    racket.style.left = racketLeft + "%";
+    racket.position.left -= racket.velocity.left;
+    racket.domElement.style.left = racket.position.left + "%";
 }
 function moveRight() {
-    if (racketLeft >= 79) // enforce a maximum horiz position of 79
+    if (racket.position.left >= 79) // enforce a maximum horiz position of 79
         return false;
-    racketLeft += racketStep;
-    racket.style.left = racketLeft + "%";
+    racket.position.left += racket.velocity.left;
+    racket.domElement.style.left = racket.position.left + "%";
 }
 
 // Move the ball
 function checkForBounce() {
     // bounce horizontally if needed
-    if (ballLeft <= 0 || (ballLeft + 5) >= 100)
-        dBallLeft = 0 - dBallLeft;
+    if (ball.position.left <= 0 || (ball.position.left + 5) >= 100)
+        ball.velocity.left = 0 - ball.velocity.left;
 
     // bounce vertically if needed
-    if ( // ball touches racket
-        (ballLeft + 2) > (racketLeft - 5) &&
-        (ballLeft + 2) < (racketLeft + 25) &&
-        ballTop == 480
+    if ( // if ball touches racket
+        (ball.position.left + 2) > (racket.position.left - 5) &&
+        (ball.position.left + 2) < (racket.position.left + 25) &&
+        ball.position.top == 480
     )
-        dBallTop = 0 - dBallTop;
-    else if (ballTop == 0) // ball touches top of wrapper
-        dBallTop = 0 - dBallTop;
-    else if (ballTop == 550) { // ball touches bottom of wrapper
+        ball.velocity.top = 0 - ball.velocity.top;
+    else if (ball.position.top == 0) // if ball touches top of wrapper
+        ball.velocity.top = 0 - ball.velocity.top;
+    else if (ball.position.top == 550) { // if ball touches bottom of wrapper
         // game over
         stopTimer();
         splashScreen.style.display = "block"; // show the splashScreen
     }
 }
 function applyBallUnits(x, y) {
-    ball.style.left = ballLeft + "%";
-    ball.style.top = ballTop + "px";
+    ball.domElement.style.left = ball.position.left + "%";
+    ball.domElement.style.top = ball.position.top + "px";
 }
 function startTimer() {
     restart();
@@ -136,16 +147,16 @@ function setTimerId() {
 }
 function animateOneFrame() {
     checkForBounce();
-	ballTop += dBallTop;
-	ballLeft += dBallLeft;
-	applyBallUnits(ballLeft + 17.5, ballTop);
-    stopWatch += (33.3 / 1000) // convert milliseconds to seconds and round;
-    timeRunning.innerHTML = stopWatch.toFixed(1);
+	ball.position.top += ball.velocity.top;
+	ball.position.left += ball.velocity.left;
+	applyBallUnits(ball.position.left + 17.5, ball.position.top);
+    stopWatch += (33.3 / 1000) // convert milliseconds to seconds
+    timeRunning.innerHTML = stopWatch.toFixed(2); // round seconds
 }
 function stopTimer() {
     console.log("----stopping timer #" + timerID);
     clearInterval(timerID);
-    score = stopWatch.toFixed(2);
+    score = (stopWatch + 0.03).toFixed(2);
     scoreString.innerHTML = score + " "; // show final score
     displayHighScore();
 }
@@ -155,23 +166,23 @@ function restart() {
     splashScreen.style.display = "none"; // hide the splashScreen
     stopWatch = 0;
     // reset position of ball but not racket
-    ballLeft = 50;
-    ballTop = 300;
-    ballDepth = 1
-    applyDepthStyle(ball, ballDepth);
-    applyBallUnits(ballLeft, ballTop);
-    dBallLeft = (Math.random() * Math.floor(3)) - 1
-    dBallTop = -10;
+    ball.position.left = 50;
+    ball.position.top = 300;
+    ball.position.depth = 1
+    applyDepthStyle(ball.domElement, ball.position.depth);
+    applyBallUnits(ball.position.left, ball.position.top);
+    ball.velocity.left = (Math.random() * Math.floor(3)) - 1
+    ball.velocity.top = -10;
 }
 function displayHighScore() {
     // determine highest score
-    let pulledScore = JSON.parse(window.localStorage.getItem("high_score"));
+    let pulledScore = JSON.parse(window.localStorage.getItem("tennis3d_high_score"));
     if (pulledScore && parseInt(pulledScore) > score) {
         highScore = pulledScore; // highScore is already a string
     } else {
         highScore = score + " "; // make highScore a string
         console.log(highScore);
-        localStorage.setItem("high_score", JSON.stringify(highScore)); // push to localStorage
+        localStorage.setItem("tennis3d_high_score", JSON.stringify(highScore)); // push to localStorage
     }
     // display highest score
     highScoreString.innerHTML = highScore;
