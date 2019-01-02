@@ -165,10 +165,11 @@ p {
     border-radius: 90px;
     box-shadow: 0 6px 24px 3px gray;
     height: 35px;
+    left: 50%;
     position: relative;
+    top: 300px;
     width: 35px;
 }
-
 .racket {
     border-radius: 6px 6px 24px 24px;
     box-shadow: 0 6px 24px 3px gray;
