@@ -1,146 +1,6 @@
 "use strict";
 console.clear();
 
-// Define the styles for each depth
-let depthStyles = [
-	{
-		name: 'far',
-		color: 'purple',
-		minDepth: 100,
-		maxDepth: 132,
-		backgroundColor: "#6700ce",
-		border: "5px solid #7b00f6",
-		zIndex: "116"
-	},
-	{
-		name: 'middle',
-		color: 'pink',
-		minDepth: 132,
-		maxDepth: 164,
-		backgroundColor: "#c08cff",
-		border: "5px solid #d3a7ff",
-		zIndex: "148"
-	},
-	{
-		name: 'near',
-		color: 'white',
-		minDepth: 164,
-		maxDepth: 196,
-		backgroundColor: "#f1e2ff",
-		border: "5px solid #fff5fb",
-		zIndex: "180"
-	}
-]
-function applyDepthStyle(element, newDepth) {
-	newDepth = Math.floor(newDepth); // jump over the floating point gaps between depths
-	let newDepthStyle;
-	for (let i = 0; i < depthStyles.length; i++) {
-		if ((newDepth >= depthStyles[i].minDepth) 
-			&& (newDepth < depthStyles[i].maxDepth))
-			newDepthStyle = depthStyles[i];
-	}
-	element.style.backgroundColor = newDepthStyle.backgroundColor;
-	element.style.border = newDepthStyle.border;
-	element.style.zIndex = newDepthStyle.zIndex;
-}
-// Set starting values
-let splashScreen = document.getElementById("splash-screen");
-let timeRunning = document.getElementById("time-running");
-let scoreString = document.getElementById("score-string");
-let highScoreString = document.getElementById("high-score-string");
-let timerID;
-let stopWatch = 0;
-let score;
-let highScore;
-let firstScore = JSON.parse(window.localStorage.getItem("tennis3d_high_score"));
-if (firstScore)
-	highScoreString.innerHTML = firstScore;
-// Set the racket's starting values
-racket = {
-	domElement: document.getElementsByClassName("racket")[0],
-	position: {
-		left: 40, // initial horiz position (%)
-		depth: 148
-	},
-	velocity: {
-		left: 10, // step size for animation
-		// depth: //random
-	},
-	moveNearer: function() {
-		if (racket.position.depth + 32 >= 196) // enforce a maximum racket.position.depth of 196
-			return false;
-		racket.position.depth += 32;
-		applyDepthStyle(racket.domElement, racket.position.depth)
-	},
-	moveFarther: function() {
-		if (racket.position.depth - 32 <= 100) // enforce a minimum racket.position.depth of 100
-			return false;
-		racket.position.depth -= 32;
-		applyDepthStyle(racket.domElement, racket.position.depth)
-	},
-	moveLeft: function() {
-		if (racket.position.left <= 0) // enforce a minimum horiz position of 0
-			return false;
-		racket.position.left -= racket.velocity.left;
-		racket.domElement.style.left = racket.position.left + "%";
-	},
-	moveRight: function() {
-		if (racket.position.left >= 79) // enforce a maximum horiz position of 79
-			return false;
-		racket.position.left += racket.velocity.left;
-		racket.domElement.style.left = racket.position.left + "%";
-	}
-}
-applyDepthStyle(racket.domElement, racket.position.depth);
-// Set the ball's starting values
-ball = {
-	domElement: document.getElementsByClassName("ball")[0],
-	position: {
-		left: 50, // (% instead of px)
-		top: 300,
-		depth: 148,
-		apply: function(x, y, z) {
-			ball.domElement.style.left = ball.position.left + "%"; // x
-			ball.domElement.style.top = ball.position.top + "px";  // y
-			applyDepthStyle(ball.domElement, ball.position.depth); // z
-		}
-	},
-	velocity: {
-		Left: (3 * Math.random()) - 1, // step size for animation (px)
-		Top: -10, // step size for animation (%)
-		depth: (2 * Math.random()) - 1,
-		checkForBounce: function() {
-			//removing 'bouncing' class
-
-
-			// bounce into/out of screen if needed
-			if (ball.position.depth < 101 || (ball.position.depth) > 195) {
-				ball.velocity.depth = 0 - ball.velocity.depth;
-				console.log('BOUNCE')
-				// add 'bouncing' class
-			}
-			// bounce horizontally if needed
-			if (ball.position.left <= 0 || (ball.position.left + 5) >= 100)
-				ball.velocity.left = 0 - ball.velocity.left;
-			// bounce vertically if needed
-			if ( // if ball touches racket
-				(ball.position.left + 2) > (racket.position.left - 5) &&
-				(ball.position.left + 2) < (racket.position.left + 25) &&
-				ball.position.top == 480
-			)
-				ball.velocity.top = 0 - ball.velocity.top;
-			else if (ball.position.top == 0) // if ball touches top of wrapper
-				ball.velocity.top = 0 - ball.velocity.top;
-			else if (ball.position.top == 550) { // if ball touches bottom of wrapper
-				// end the game
-				stopTimer();
-				splashScreen.style.display = "block"; // show the splashScreen
-			}
-		}
-	}
-}
-applyDepthStyle(ball.domElement, ball.position.depth);
-
 // Event listeners for keyboard and mouse activity
 window.addEventListener("keydown", function(e) {
 	switch (e.keyCode || e.which) {
@@ -160,6 +20,158 @@ window.addEventListener("keydown", function(e) {
 });
 document.getElementById("start-button").addEventListener("click", startTimer);
 
+
+class item {
+	constructor(de, pos, vel) {
+		this.domElement = de;
+		this.position = pos;
+		this.velocity = vel;
+		this.depthStyles = [
+			{
+				name: 'far',
+				color: 'purple',
+				minDepth: 100,
+				maxDepth: 132,
+				backgroundColor: "#0e001b",
+				border: "5px solid #7b00f6",
+				zIndex: "116"
+			},
+			{
+				name: 'middle',
+				color: 'pink',
+				minDepth: 132,
+				maxDepth: 164,
+				backgroundColor: "#c08cff",
+				border: "5px solid #d3a7ff",
+				zIndex: "148"
+			},
+			{
+				name: 'near',
+				color: 'white',
+				minDepth: 164,
+				maxDepth: 196,
+				backgroundColor: "#f1e2ff",
+				border: "5px solid #fff5fb",
+				zIndex: "180"
+			}
+		]
+	}
+	applyDepthStyle(element, newDepth) {
+		let newDepthStyle;
+		for (let i = 0; i < this.depthStyles.length; i++) {
+			if ((newDepth >= this.depthStyles[i].minDepth) 
+				&& (newDepth < this.depthStyles[i].maxDepth))
+				newDepthStyle = this.depthStyles[i];
+		}
+		element.style.backgroundColor = newDepthStyle.backgroundColor;
+		element.style.border = newDepthStyle.border;
+		element.style.zIndex = newDepthStyle.zIndex;
+	}
+}
+
+
+// Create a racket
+let racket = new item(
+	document.getElementsByClassName("racket")[0],
+	{ // set starting position
+		left: 40, // in %
+		depth: 148 // range is 100 to 196 (no unit)
+	},
+	{ // set starting velocity (step size for animation)
+		left: 10, // in %
+	},
+);
+racket.moveNearer = function() {
+	if (this.position.depth + 32 >= 196) // enforce a maximum racket.position.depth of 196
+		return false;
+	this.position.depth += 32;
+	this.applyDepthStyle(this.domElement, this.position.depth)
+},
+racket.moveFarther = function() {
+	if (this.position.depth - 32 <= 100) // enforce a minimum racket.position.depth of 100
+		return false;
+	this.position.depth -= 32;
+	this.applyDepthStyle(this.domElement, this.position.depth)
+},
+racket.moveLeft = function() {
+	if (this.position.left <= 0) // enforce a minimum horiz position of 0
+		return false;
+	this.position.left -= this.velocity.left;
+	this.domElement.style.left = this.position.left + "%";
+},
+racket.moveRight = function() {
+	if (this.position.left >= 79) // enforce a maximum horiz position of 79
+		return false;
+	this.position.left += this.velocity.left;
+	this.domElement.style.left = this.position.left + "%";
+}
+racket.applyDepthStyle(racket.domElement, racket.position.depth);
+
+
+// Create a ball
+let ball = new item(
+	document.getElementsByClassName("ball")[0],
+	{ // set starting position
+		left: 50, // in %
+		top: 300,
+		depth: 148, // range is 100 to 196 (no unit)
+		apply: function(x, y, z) {
+			ball.domElement.style.left = ball.position.left + "%"; // x
+			ball.domElement.style.top = ball.position.top + "px";  // y
+			ball.applyDepthStyle(ball.domElement, ball.position.depth); // z
+		}
+	}, 
+	{ // set starting velocity (step size for animation)
+		Left: (3 * Math.random()) - 1, // in px
+		Top: -10, // in %
+		depth: (2 * Math.random()) - 1, // no unit
+	},
+)
+ball.checkForBounce = function() {
+	//removing 'bouncing' class
+
+
+	// bounce into/out of screen if needed
+	if (ball.position.depth < 101 || (ball.position.depth) > 195) {
+		ball.velocity.depth = 0 - ball.velocity.depth;
+		console.log('BOUNCE')
+		// add 'bouncing' class
+	}
+	// bounce horizontally if needed
+	if (ball.position.left <= 0 || (ball.position.left + 5) >= 100)
+		ball.velocity.left = 0 - ball.velocity.left;
+	// bounce vertically if needed
+	if ( // if ball touches racket
+		(ball.position.left + 2) > (racket.position.left - 5) &&
+		(ball.position.left + 2) < (racket.position.left + 25) &&
+		ball.position.top == 480
+	)
+		ball.velocity.top = 0 - ball.velocity.top;
+	else if (ball.position.top == 0) // if ball touches top of wrapper
+		ball.velocity.top = 0 - ball.velocity.top;
+	else if (ball.position.top == 550) { // if ball touches bottom of wrapper
+		// end the game
+		stopTimer();
+		splashScreen.style.display = "block"; // show the splashScreen
+	}
+}
+ball.applyDepthStyle(ball.domElement, ball.position.depth);
+
+
+// Set starting values
+let splashScreen = document.getElementById("splash-screen");
+let timeRunning = document.getElementById("time-running");
+let scoreString = document.getElementById("score-string");
+let highScoreString = document.getElementById("high-score-string");
+let timerID;
+let stopWatch = 0;
+let score;
+let highScore;
+let firstScore = JSON.parse(window.localStorage.getItem("tennis3d_high_score"));
+if (firstScore)
+	highScoreString.innerHTML = firstScore;
+
+
 // Timing and animation
 function startTimer() {
 	restart();
@@ -172,7 +184,7 @@ function setTimerId() {
 	}();
 }
 function animateOneFrame() {
-	ball.velocity.checkForBounce();
+	ball.checkForBounce();
 	ball.position.top += ball.velocity.top;
 	ball.position.left += ball.velocity.left;
 	ball.position.depth += ball.velocity.depth;
@@ -201,7 +213,7 @@ function restart() {
 	ball.position.left = 50;
 	ball.position.top = 300;
 	ball.position.depth = 148
-	applyDepthStyle(ball.domElement, ball.position.depth);
+	ball.applyDepthStyle(ball.domElement, ball.position.depth);
 	ball.position.apply(ball.position.left, ball.position.top);
 	ball.velocity.left = (Math.random() * Math.floor(3)) - 1
 	ball.velocity.top = -10;
