@@ -3,22 +3,28 @@ console.clear();
 
 // Define the styles for each depth
 let depthStyles = [
-	{ // far (purple)
+	{
+		name: 'far',
+		color: 'purple',
 		minDepth: 100,
 		maxDepth: 132,
 		backgroundColor: "#6700ce",
 		border: "5px solid #7b00f6",
 		zIndex: "116"
 	},
-	{ // middle (pink)
-		minDepth: 133,
+	{
+		name: 'middle',
+		color: 'pink',
+		minDepth: 132,
 		maxDepth: 164,
 		backgroundColor: "#c08cff",
 		border: "5px solid #d3a7ff",
 		zIndex: "148"
 	},
-	{ // near (white)
-		minDepth: 165,
+	{
+		name: 'near',
+		color: 'white',
+		minDepth: 164,
 		maxDepth: 196,
 		backgroundColor: "#f1e2ff",
 		border: "5px solid #fff5fb",
@@ -26,12 +32,12 @@ let depthStyles = [
 	}
 ]
 function applyDepthStyle(element, newDepth) {
+	newDepth = Math.floor(newDepth); // jump over the floating point gaps between depths
 	let newDepthStyle;
 	for (let i = 0; i < depthStyles.length; i++) {
-		if ((newDepth > depthStyles[i].minDepth) 
-			&& (newDepth < depthStyles[i].maxDepth)) {
+		if ((newDepth >= depthStyles[i].minDepth) 
+			&& (newDepth < depthStyles[i].maxDepth))
 			newDepthStyle = depthStyles[i];
-		}
 	}
 	element.style.backgroundColor = newDepthStyle.backgroundColor;
 	element.style.border = newDepthStyle.border;
@@ -93,15 +99,26 @@ ball = {
 		left: 50, // (% instead of px)
 		top: 300,
 		depth: 148,
-		apply: function(x, y) {
-			ball.domElement.style.left = ball.position.left + "%";
-			ball.domElement.style.top = ball.position.top + "px";
+		apply: function(x, y, z) {
+			ball.domElement.style.left = ball.position.left + "%"; // x
+			ball.domElement.style.top = ball.position.top + "px";  // y
+			applyDepthStyle(ball.domElement, ball.position.depth); // z
 		}
 	},
 	velocity: {
-		Left: (Math.random() * Math.floor(3)) - 1, // step size for animation (px)
+		Left: (3 * Math.random()) - 1, // step size for animation (px)
 		Top: -10, // step size for animation (%)
+		depth: (2 * Math.random()) - 1,
 		checkForBounce: function() {
+			//removing 'bouncing' class
+
+
+			// bounce into/out of screen if needed
+			if (ball.position.depth < 101 || (ball.position.depth) > 195) {
+				ball.velocity.depth = 0 - ball.velocity.depth;
+				console.log('BOUNCE')
+				// add 'bouncing' class
+			}
 			// bounce horizontally if needed
 			if (ball.position.left <= 0 || (ball.position.left + 5) >= 100)
 				ball.velocity.left = 0 - ball.velocity.left;
@@ -158,7 +175,12 @@ function animateOneFrame() {
 	ball.velocity.checkForBounce();
 	ball.position.top += ball.velocity.top;
 	ball.position.left += ball.velocity.left;
-	ball.position.apply(ball.position.left + 17.5, ball.position.top);
+	ball.position.depth += ball.velocity.depth;
+	ball.position.apply(
+		ball.position.left + 17.5, 
+		ball.position.top, 
+		ball.position.depth
+		);
 	stopWatch += (33.3 / 1000) // convert milliseconds to seconds
 	timeRunning.innerHTML = stopWatch.toFixed(2); // round seconds
 }
@@ -183,6 +205,7 @@ function restart() {
 	ball.position.apply(ball.position.left, ball.position.top);
 	ball.velocity.left = (Math.random() * Math.floor(3)) - 1
 	ball.velocity.top = -10;
+	ball.velocity.depth = (2 * Math.random()) - 1;
 	// ball.velocity.depth = ;//random
 }
 function displayHighScore() {
@@ -192,7 +215,6 @@ function displayHighScore() {
 		highScore = pulledScore; // highScore is already a string
 	} else {
 		highScore = score + " "; // make highScore a string
-		console.log(highScore);
 		localStorage.setItem("tennis3d_high_score", JSON.stringify(highScore)); // push to localStorage
 	}
 	// display highest score
