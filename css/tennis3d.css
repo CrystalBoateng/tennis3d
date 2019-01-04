@@ -1,4 +1,4 @@
-/*base color: https://www.colorhexa.com/400080*/
+@import "hovereffects.css";
 
 /* ************************************
 *
@@ -9,12 +9,27 @@ body {
 	background-color: black;
 	color: white;
 }
-
 #wrapper {
 	font-family: Futura, Trebuchet MS, Arial, sans-serif;
 	width: 100%;
 }
 
+/* ************************************
+*
+*== Header
+*
+************************************* */
+#header {
+	background: #000000;
+	background: -moz-linear-gradient(left, #000000 10%, #9532ff 47%, #000000 90%);
+	background: -webkit-linear-gradient(left, #000000 10%, #9532ff 47%, #000000 90%);
+	background: linear-gradient(to right, #000000 10%, #9532ff 47%, #000000 90%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#000000', GradientType=1);
+	height: 23px;
+	margin: 23px 0 46px;
+	text-align: center;
+	width: 100%;
+}
 h1 {
 	color: #6a389c;
 	font-family: 'Bungee Inline', cursive;
@@ -33,6 +48,9 @@ h1 {
 		-2px -2px 0 #ddbbff,
 		2px -2px 0 #ddbbff,
 		-2px 2px 0 #ddbbff;
+}
+h1 span:hover {
+	color: black;
 }
 h1 span {
 	text-shadow: 6px 0 0 gray,
@@ -62,23 +80,6 @@ p {
 	line-height: 23px;
 	margin: 23px 0;
 	text-align: center;
-}
-
-/* ************************************
-*
-*== Header
-*
-************************************* */
-#header {
-	background: #000000;
-	background: -moz-linear-gradient(left, #000000 10%, #9532ff 47%, #000000 90%);
-	background: -webkit-linear-gradient(left, #000000 10%, #9532ff 47%, #000000 90%);
-	background: linear-gradient(to right, #000000 10%, #9532ff 47%, #000000 90%);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#000000', GradientType=1);
-	height: 23px;
-	margin: 23px 0 46px;
-	text-align: center;
-	width: 100%;
 }
 
 /* ************************************
@@ -135,7 +136,6 @@ p {
 	border-radius: 90px;
 	border: solid 3px #f1e2ff;
 	box-shadow: 0 6px 24px -3px #1f007e;
-	color: white;
 	cursor: pointer;
 	display: block;
 	font-family: Futura, Trebuchet MS, Arial, sans-serif;
@@ -146,6 +146,20 @@ p {
 	margin-top: 48px;
 	width: 240px;
 }
+// Animation
+.js-loading *,
+.js-loading *:before,
+.js-loading *:after {
+  animation-play-state: paused !important;
+}
+.fall {
+  animation: come-in 0.2s linear;
+}
+@keyframes come-in {
+  from { transform: translateY(-200px); }
+  to { transform: translateY(0); }
+}
+
 /* ************************************
 *
 *== Court
@@ -167,6 +181,9 @@ p {
 	right: 0px;
 	text-align: right;
 	z-index: 899;
+}
+.bouncing {
+	box-shadow: 0 0 23px 12px white !important;
 }
 .ball {
 	border-radius: 90px;

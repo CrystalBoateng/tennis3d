@@ -3,6 +3,7 @@
   <head>
     <title>tennis3d</title>
     <link href="https://fonts.googleapis.com/css?family=Bungee+Inline" rel="stylesheet">
+    <script type="text/javascript" src="js/tennis3d.js"></script>
     <link rel="stylesheet" type="text/css" href="css/tennis3d.css">
     <meta charset="UTF-8">
   </head>
@@ -15,12 +16,12 @@
       <div id="directions">
         <p>Use all four arrow keys to control the tennis racket. Color indicates depth into the screen.</p>
       </div>
-      <div id="splash-screen">
+      <div id="splash-screen" class="fall">
         <div>
           <h3>Score: <span id="score-string">0</span><span id="score-unit">seconds</span></h3>
         </div>
         <div id="high-score">High score: <span id="high-score-string">0</span>s</div>
-        <button id="start-button">Start!</button>
+        <button id="start-button" class="hvr-radial-out">Start!</button>
       </div>
       <div id="court">
         <div id="time-running"></div>
@@ -28,8 +29,5 @@
           <div id="racket" class="racket"></div>
       </div>
     </div>
-
-
-    <script type="text/javascript" src="js/tennis3d.js"></script>
   </body>
 </html>
