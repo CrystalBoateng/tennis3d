@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 	document.getElementById("start-button").addEventListener("click", startTimer);
 
-
 	class item {
 		constructor(de, pos, vel) {
 			this.domElement = de;
@@ -40,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					minDepth: 100,
 					maxDepth: 132,
 					backgroundColor: "#0e001b",
-					border: "5px solid #7b00f6",
+					border: "1px solid #7b00f6",
 					zIndex: "116"
 				},
 				{
@@ -58,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					minDepth: 164,
 					maxDepth: 196,
 					backgroundColor: "#f1e2ff",
-					border: "5px solid #fff5fb",
+					border: "10px solid #fff5fb",
 					zIndex: "180"
 				}
 			]
@@ -89,14 +88,20 @@ document.addEventListener("DOMContentLoaded", function() {
 		},
 	);
 	racket.moveNearer = function() {
-		if (this.position.depth + 32 >= 196) // enforce a maximum racket.position.depth of 196
+		// enforce a maximum racket.position.depth of 196
+		if (this.position.depth + 32 >= 196) {
+			this.domElement.classList.add("bouncing")
 			return false;
+		}
 		this.position.depth += 32;
 		this.applyDepthStyle(this.domElement, this.position.depth)
 	},
 	racket.moveFarther = function() {
-		if (this.position.depth - 32 <= 100) // enforce a minimum racket.position.depth of 100
+		// enforce a minimum racket.position.depth of 100
+		if (this.position.depth - 32 <= 100) {
+			this.domElement.classList.add("bouncing")
 			return false;
+		}
 		this.position.depth -= 32;
 		this.applyDepthStyle(this.domElement, this.position.depth)
 	},
@@ -136,26 +141,27 @@ document.addEventListener("DOMContentLoaded", function() {
 	)
 	ball.checkForBounce = function() {
 		// remove 'bouncing' class
-		ball.domElement.classList.remove("bouncing");
-
+		this.domElement.classList.remove("bouncing");
 		// bounce into/out of screen if needed
-		if (ball.position.depth < 101 || (ball.position.depth) > 195) {
-			ball.velocity.depth = 0 - ball.velocity.depth;
-			ball.domElement.classList.add("bouncing"); // add 'bouncing' class
+		if (this.position.depth < 101 || (this.position.depth) > 195) {
+			this.velocity.depth = 0 - this.velocity.depth;
+			this.domElement.classList.add("bouncing"); // add 'bouncing' class
 		}
 		// bounce horizontally if needed
-		if (ball.position.left <= 0 || (ball.position.left + 5) >= 100)
-			ball.velocity.left = 0 - ball.velocity.left;
+		if (this.position.left <= 0 || (this.position.left + 5) >= 100)
+			this.velocity.left = 0 - this.velocity.left;
 		// bounce vertically if needed
 		if ( // if ball touches racket
-			(ball.position.left + 2) > (racket.position.left - 5) &&
-			(ball.position.left + 2) < (racket.position.left + 25) &&
-			ball.position.top == 480
+			(this.position.left + 2) > (racket.position.left - 5) && // same horiz pos
+			(this.position.left + 2) < (racket.position.left + 25) && // same horiz pos
+			this.position.top == 480 && // same height
+			this.domElement.style.backgroundColor == 
+				racket.domElement.style.backgroundColor // same depth
 		)
-			ball.velocity.top = 0 - ball.velocity.top;
-		else if (ball.position.top == 0) // if ball touches top of wrapper
-			ball.velocity.top = 0 - ball.velocity.top;
-		else if (ball.position.top == 550) { // if ball touches bottom of wrapper
+			this.velocity.top = 0 - this.velocity.top;
+		else if (this.position.top == 0) // if ball touches top of wrapper
+			this.velocity.top = 0 - this.velocity.top;
+		else if (this.position.top == 550) { // if ball touches bottom of wrapper
 			// end the game
 			stopTimer();
 			splashScreen.style.display = "block"; // show the splashScreen
@@ -190,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		}();
 	}
 	function animateOneFrame() {
+		racket.domElement.classList.remove("bouncing");
 		ball.checkForBounce();
 		ball.position.top += ball.velocity.top;
 		ball.position.left += ball.velocity.left;
