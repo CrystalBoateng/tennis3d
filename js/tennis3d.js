@@ -2,27 +2,30 @@
 console.clear();
 
 document.addEventListener("DOMContentLoaded", function() {
-	// Wait for elements to laod before allowing any animations
+	// Wait for elements to load before allowing any animations
 	document.body.classList.add('js-loading');
-	window.addEventListener("load", function(){
+	window.addEventListener("load", function() {
 		document.body.classList.remove('js-loading')
 	});
-
 	// Event listeners for keyboard and mouse activity
 	window.addEventListener("keydown", function(e) {
 		switch (e.keyCode || e.which) {
 			case 37: // left arrow key
-				e.preventDefault(); racket.moveLeft(); break;
+				e.preventDefault();
+				racket.moveLeft();
+				break;
 			case 38: // up arrow key
-				e.preventDefault(); racket.moveNearer(); break;
+				e.preventDefault();
+				racket.moveNearer();
+				break;
 			case 39: // right arrow key
-				e.preventDefault(); racket.moveRight(); break;
+				e.preventDefault();
+				racket.moveRight();
+				break;
 			case 40: // down arrow key
-				e.preventDefault(); racket.moveFarther(); break;
-			case 32: // ignore space bar
-				e.preventDefault(); break;
-			case 13: // ignore enter key
-				e.preventDefault(); break;
+				e.preventDefault();
+				racket.moveFarther();
+				break;
 		}
 	});
 	document.getElementById("start-button").addEventListener("click", startTimer);
@@ -32,8 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			this.domElement = de;
 			this.position = pos;
 			this.velocity = vel;
-			this.depthStyles = [
-				{
+			this.depthStyles = [{
 					name: 'far',
 					color: 'purple',
 					minDepth: 100,
@@ -65,8 +67,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		applyDepthStyle(element, newDepth) {
 			let newDepthStyle;
 			for (let i = 0; i < this.depthStyles.length; i++) {
-				if ((newDepth >= this.depthStyles[i].minDepth) 
-					&& (newDepth < this.depthStyles[i].maxDepth))
+				if ((newDepth >= this.depthStyles[i].minDepth) &&
+					(newDepth < this.depthStyles[i].maxDepth))
 					newDepthStyle = this.depthStyles[i];
 			}
 			element.style.backgroundColor = newDepthStyle.backgroundColor;
@@ -78,62 +80,58 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// Create a racket
 	let racket = new item(
-		document.getElementsByClassName("racket")[0],
-		{ // set starting position
+		document.getElementsByClassName("racket")[0], { // set starting position
 			left: 40, // in %
 			depth: 148 // range is 100 to 196 (no unit)
-		},
-		{ // set starting velocity (step size for animation)
+		}, { // set starting velocity (step size for animation)
 			left: 10, // in %
 		},
 	);
 	racket.moveNearer = function() {
-		// enforce a maximum racket.position.depth of 196
-		if (this.position.depth + 32 >= 196) {
-			this.domElement.classList.add("bouncing")
-			return false;
+			// enforce maximum racket.position.depth = 196
+			if (this.position.depth + 32 >= 196) {
+				this.domElement.classList.add("bouncing")
+				return false;
+			}
+			this.position.depth += 32;
+			this.applyDepthStyle(this.domElement, this.position.depth)
+		},
+		racket.moveFarther = function() {
+			// enforce minimum racket.position.depth = 100
+			if (this.position.depth - 32 <= 100) {
+				this.domElement.classList.add("bouncing")
+				return false;
+			}
+			this.position.depth -= 32;
+			this.applyDepthStyle(this.domElement, this.position.depth)
+		},
+		racket.moveLeft = function() {
+			if (this.position.left <= 0) // enforce minimum horiz position = 0
+				return false;
+			this.position.left -= this.velocity.left;
+			this.domElement.style.left = this.position.left + "%";
+		},
+		racket.moveRight = function() {
+			if (this.position.left >= 79) // enforce maximum horiz position = 79
+				return false;
+			this.position.left += this.velocity.left;
+			this.domElement.style.left = this.position.left + "%";
 		}
-		this.position.depth += 32;
-		this.applyDepthStyle(this.domElement, this.position.depth)
-	},
-	racket.moveFarther = function() {
-		// enforce a minimum racket.position.depth of 100
-		if (this.position.depth - 32 <= 100) {
-			this.domElement.classList.add("bouncing")
-			return false;
-		}
-		this.position.depth -= 32;
-		this.applyDepthStyle(this.domElement, this.position.depth)
-	},
-	racket.moveLeft = function() {
-		if (this.position.left <= 0) // enforce a minimum horiz position of 0
-			return false;
-		this.position.left -= this.velocity.left;
-		this.domElement.style.left = this.position.left + "%";
-	},
-	racket.moveRight = function() {
-		if (this.position.left >= 79) // enforce a maximum horiz position of 79
-			return false;
-		this.position.left += this.velocity.left;
-		this.domElement.style.left = this.position.left + "%";
-	}
 	racket.applyDepthStyle(racket.domElement, racket.position.depth);
 
 
 	// Create a ball
 	let ball = new item(
-		document.getElementsByClassName("ball")[0],
-		{ // set starting position
+		document.getElementsByClassName("ball")[0], { // set starting position
 			left: 50, // in %
 			top: 300,
 			depth: 148, // range is 100 to 196 (no unit)
 			apply: function(x, y, z) {
 				ball.domElement.style.left = ball.position.left + "%"; // x
-				ball.domElement.style.top = ball.position.top + "px";  // y
+				ball.domElement.style.top = ball.position.top + "px"; // y
 				ball.applyDepthStyle(ball.domElement, ball.position.depth); // z
 			}
-		}, 
-		{ // set starting velocity (step size for animation)
+		}, { // set starting velocity (step size for animation)
 			Left: (3 * Math.random()) - 1, // in px
 			Top: -10, // in %
 			depth: (2 * Math.random()) - 1, // no unit
@@ -152,11 +150,11 @@ document.addEventListener("DOMContentLoaded", function() {
 			this.velocity.left = 0 - this.velocity.left;
 		// bounce vertically if needed
 		if ( // if ball touches racket
-			(this.position.left + 2) > (racket.position.left - 5) && // same horiz pos
-			(this.position.left + 2) < (racket.position.left + 25) && // same horiz pos
-			this.position.top == 480 && // same height
-			this.domElement.style.backgroundColor == 
-				racket.domElement.style.backgroundColor // same depth
+			(this.position.left + 2) > (racket.position.left - 5) && // matching horiz pos
+			(this.position.left + 2) < (racket.position.left + 25) && // matching horiz pos
+			this.position.top == 480 && // matching height
+			this.domElement.style.backgroundColor ==
+			racket.domElement.style.backgroundColor // matching depth
 		)
 			this.velocity.top = 0 - this.velocity.top;
 		else if (this.position.top == 0) // if ball touches top of wrapper
@@ -191,8 +189,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		console.log("----starting timer #" + timerID);
 	}
 	function setTimerId() {
-		return function(){
-			return(setInterval(animateOneFrame, 30));
+		return function() {
+			return (setInterval(animateOneFrame, 30));
 		}();
 	}
 	function animateOneFrame() {
@@ -202,10 +200,10 @@ document.addEventListener("DOMContentLoaded", function() {
 		ball.position.left += ball.velocity.left;
 		ball.position.depth += ball.velocity.depth;
 		ball.position.apply(
-			ball.position.left + 17.5, 
-			ball.position.top, 
+			ball.position.left + 17.5,
+			ball.position.top,
 			ball.position.depth
-			);
+		);
 		stopWatch += (33.3 / 1000) // convert milliseconds to seconds
 		timeRunning.innerHTML = stopWatch.toFixed(2); // round seconds
 	}
@@ -241,7 +239,10 @@ document.addEventListener("DOMContentLoaded", function() {
 			highScore = pulledScore; // highScore is already a string
 		} else {
 			highScore = score + " "; // make highScore a string
-			localStorage.setItem("tennis3d_high_score", JSON.stringify(highScore)); // push to localStorage
+			localStorage.setItem( // push to localStorage
+				"tennis3d_high_score",
+				JSON.stringify(highScore)
+			);
 		}
 		// display highest score
 		highScoreString.innerHTML = highScore;
