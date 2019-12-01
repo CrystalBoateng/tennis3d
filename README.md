@@ -1,3 +1,3 @@
 # Tennis3D
-Browser game in vanilla JavaScript.
+Run the game by downloading the repo and opening main.html.
 ![Screenshot of racket and ball against a purple background](screenshot.JPG)
