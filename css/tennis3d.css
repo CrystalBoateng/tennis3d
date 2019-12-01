@@ -19,7 +19,7 @@ body {
 *== Header
 *
 ************************************* */
-#header {
+header {
 	background: #000000;
 	background: -moz-linear-gradient(left, #000000 10%, #9532ff 47%, #000000 90%);
 	background: -webkit-linear-gradient(left, #000000 10%, #9532ff 47%, #000000 90%);
@@ -27,7 +27,6 @@ body {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#000000', GradientType=1);
 	height: 23px;
 	margin: 23px 0 46px;
-	text-align: center;
 	width: 100%;
 }
 h1 {
@@ -39,6 +38,7 @@ h1 {
 	font-weight: 700;
 	line-height: 0;
 	letter-spacing: 6px;
+	text-align: center;
 	text-shadow:
 		6px 0 0 #d3a7ff,
 		-6px 0 0 #ddbbff,
@@ -165,7 +165,7 @@ p {
 *== Court
 *
 ************************************* */
-#court {
+section {
 	background-color: #563da0;
 	border-radius: 16px;
 	border: 5px solid #51389c;
